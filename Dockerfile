@@ -12,22 +12,27 @@ ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libg
 ARG DEV_USER=dev
 
 # -- This are old versions, used for old applications, build the image with arguments to use newer versions
-ARG JAVA_VERSION="8"
+ARG JAVA_VERSION="11"
 # Android 10
-ARG ANDROID_VERSION="29"
-ARG ANDROID_BUILD_TOOLS_VERSION="29.0.3"
+ARG ANDROID_VERSION="30"
+ARG ANDROID_BUILD_TOOLS_VERSION="30.0.2"
 ARG ANDROID_ARCHITECTURE="x86_64"
-ARG FLUTTER_VERSION="2.2.1"
-ARG ANDROID_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip"
+ARG FLUTTER_VERSION="3.3.9"
+# 6858069 7302050 8512546
+ARG ANDROID_SDK_TOOLS_VERSION="8092744"
 
 ENV ANDROID_SDK_ROOT="/home/${DEV_USER}/android"
 ENV FLUTTER_CHANNEL="stable"
-ENV FLUTTER_URL="https://storage.googleapis.com/flutter_infra/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.tar.xz"
+# The URL could change, check the latest version in the flutter website... // TODO: Use argument instead?
+#ENV FLUTTER_URL="https://storage.googleapis.com/flutter_infra/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.tar.xz"
+ENV FLUTTER_URL="https://storage.googleapis.com/flutter_infra_release/releases/${FLUTTER_CHANNEL}/linux/flutter_linux_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.tar.xz"
 ENV FLUTTER_HOME="/home/${DEV_USER}/flutter"
+ENV FLUTTER_ROOT="${FLUTTER_HOME}"
 ENV FLUTTER_WEB_PORT="8090"
 ENV FLUTTER_DEBUG_PORT="42000"
 ENV FLUTTER_EMULATOR_NAME="flutter_emulator"
-ENV PATH="${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:${PATH}"
+#ENV PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:"
+ENV PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:"
 
 
 # Avoid user interaction
@@ -46,6 +51,7 @@ RUN apt-get install -y --no-install-recommends openjdk-${JAVA_VERSION}-jdk ${OS_
 RUN groupadd -g 1000 ${DEV_USER}
 RUN useradd -u 1000 -g ${DEV_USER} -m ${DEV_USER} -s /usr/bin/bash && echo "${DEV_USER}:${DEV_USER}" | chpasswd && adduser ${DEV_USER} sudo
 
+RUN echo 'export PATH="${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:${PATH}"' >> /home/${DEV_USER}/.bashrc
 
 # Working directory
 RUN mkdir -p /code/apps
@@ -65,28 +71,33 @@ WORKDIR /code/apps
 RUN mkdir -p ${ANDROID_SDK_ROOT} \
   && mkdir -p /home/${DEV_USER}/.android \
   && touch /home/${DEV_USER}/.android/repositories.cfg \
-  && curl -o android_tools.zip ${ANDROID_TOOLS_URL} \
-  && unzip -qq -d "${ANDROID_SDK_ROOT}" android_tools.zip \
+  && curl -o android_tools.zip "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS_VERSION}_latest.zip"
+RUN unzip -qq -d "${ANDROID_SDK_ROOT}" android_tools.zip \
   && rm android_tools.zip \
-  && mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools/tools \
-  && mv ${ANDROID_SDK_ROOT}/cmdline-tools/bin ${ANDROID_SDK_ROOT}/cmdline-tools/tools \
-  && mv ${ANDROID_SDK_ROOT}/cmdline-tools/lib ${ANDROID_SDK_ROOT}/cmdline-tools/tools \
+  #&& mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools/tools \
+  #&& ln -s ${ANDROID_SDK_ROOT}/cmdline-tools/bin ${ANDROID_SDK_ROOT}/cmdline-tools/tools \
+  #&& ln -s ${ANDROID_SDK_ROOT}/cmdline-tools/lib ${ANDROID_SDK_ROOT}/cmdline-tools/tools \
+  #&& ln -s ${ANDROID_SDK_ROOT}/cmdline-tools/tools ${ANDROID_SDK_ROOT}/cmdline-tools/latest \
+  && mv ${ANDROID_SDK_ROOT}/cmdline-tools ${ANDROID_SDK_ROOT}/latest \
+  && mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
+  && mv ${ANDROID_SDK_ROOT}/latest ${ANDROID_SDK_ROOT}/cmdline-tools \
   && yes "y" | sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
   && yes "y" | sdkmanager "platforms;android-${ANDROID_VERSION}" \
-  && yes "y" | sdkmanager "platform-tools" \
-  && yes "y" | sdkmanager "emulator" \
-  && yes "y" | sdkmanager "system-images;android-${ANDROID_VERSION};google_apis_playstore;${ANDROID_ARCHITECTURE}"
+  && yes "y" | sdkmanager "platform-tools"
+RUN yes "y" | sdkmanager "emulator"
+RUN yes "y" | sdkmanager "system-images;android-${ANDROID_VERSION};google_apis_playstore;${ANDROID_ARCHITECTURE}"
+
 
 # Flutter
-RUN curl -o flutter.tar.xz ${FLUTTER_URL} \
-  && mkdir -p ${FLUTTER_HOME} \
-  && tar xf flutter.tar.xz -C /home/${DEV_USER} \
+RUN mkdir -p ${FLUTTER_HOME} \
+  && curl -o flutter.tar.xz ${FLUTTER_URL}
+RUN tar xf flutter.tar.xz -C /home/${DEV_USER} \
   && rm flutter.tar.xz \
-  && flutter config --no-analytics \
+  && flutter config --no-analytics --android-sdk ${ANDROID_SDK_ROOT} \
   && flutter precache \
   && yes "y" | flutter doctor --android-licenses \
-  && flutter doctor \
-  && flutter emulators --create \
+  && flutter doctor
+RUN flutter emulators --create \
   && flutter update-packages
 
 
