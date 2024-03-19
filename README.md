@@ -24,4 +24,4 @@ The idea is to have a Docker container where I can connect and run any flutter a
 
 ## Run or register
 
-`docker run -d --rm --name fluttserver -v "[code-folder]:/code/apps" -it [docker-register][/id]/fluttserver`
+`docker run -d --rm --privileged --name fluttserver -v "[code-folder]:/code/apps" -v "/dev/kvm:/dev/kvm" -it [docker-register][/id]/fluttserver`
