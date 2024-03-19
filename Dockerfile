@@ -103,6 +103,9 @@ RUN tar xf flutter.tar.xz -C /home/${DEV_USER} \
 RUN flutter emulators --create \
   && flutter update-packages
 
+RUN echo "Vulkan = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
+RUN echo "GLDirectMem = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
+
 EXPOSE 5037
 EXPOSE 5900
 EXPOSE 9100
