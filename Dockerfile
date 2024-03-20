@@ -7,20 +7,20 @@
 FROM ubuntu:22.04
 
 # Set default parameters
-ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libglvnd0 x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx libxdamage-dev"
+ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libglvnd0 x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx libxdamage-dev cmake"
 
 ARG DEV_USER=dev
 
 # -- This are old versions, used for old applications, build the image with arguments to use newer versions
 ARG JAVA_VERSION="11"
 # Android 10
-ARG ANDROID_VERSION="30"
+ARG ANDROID_VERSION="30" Jul 2020
 ARG ANDROID_BUILD_TOOLS_VERSION="30.0.2"
 ARG ANDROID_ARCHITECTURE="x86_64"
-ARG FLUTTER_VERSION="3.7.0"
+ARG FLUTTER_VERSION="3.10.6"
 #ARG DART_VERSION="3.0.6"
-# 6858069 7302050 8512546
-ARG ANDROID_SDK_TOOLS_VERSION="8092744"
+# 6858069 7302050 8092744 8512546
+ARG ANDROID_SDK_TOOLS_VERSION="6858069"
 
 ENV ANDROID_SDK_ROOT="/home/${DEV_USER}/android"
 ENV CHANNEL="stable"
@@ -103,8 +103,8 @@ RUN tar xf flutter.tar.xz -C /home/${DEV_USER} \
 RUN flutter emulators --create \
   && flutter update-packages
 
-RUN echo "Vulkan = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
-RUN echo "GLDirectMem = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
+#RUN echo "Vulkan = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
+#RUN echo "GLDirectMem = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
 
 EXPOSE 5037
 EXPOSE 5900
