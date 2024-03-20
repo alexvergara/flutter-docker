@@ -14,8 +14,8 @@ ARG DEV_USER=dev
 # -- This are old versions, used for old applications, build the image with arguments to use newer versions
 ARG JAVA_VERSION="11"
 # Android 10
-ARG ANDROID_VERSION="30" Jul 2020
-ARG ANDROID_BUILD_TOOLS_VERSION="30.0.2"
+ARG ANDROID_VERSION="34"
+ARG ANDROID_BUILD_TOOLS_VERSION="34.0.0"
 ARG ANDROID_ARCHITECTURE="x86_64"
 ARG FLUTTER_VERSION="3.10.6"
 #ARG DART_VERSION="3.0.6"
