@@ -63,6 +63,16 @@ RUN gpasswd -a ${DEV_USER} kvm && adduser ${DEV_USER} kvm
 
 RUN echo 'export PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin"' >> /home/${DEV_USER}/.bashrc
 
+RUN cat <<EOT >> /home/${DEV_USER}/.bashrc
+
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+}
+
+export PS1="\e[91m\]\$(parse_git_branch)\[\e[00m\] $PS1"
+
+EOT
+
 # Working directory
 RUN mkdir -p /code/apps
 
