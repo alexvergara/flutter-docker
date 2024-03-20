@@ -12,15 +12,16 @@ ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libg
 ARG DEV_USER=dev
 
 # -- This are old versions, used for old applications, build the image with arguments to use newer versions
-ARG JAVA_VERSION="11"
+ARG JAVA_VERSION="18"
 # Android 14
 ARG ANDROID_VERSION="34"
 ARG ANDROID_BUILD_TOOLS_VERSION="34.0.0"
 ARG ANDROID_ARCHITECTURE="x86_64"
-ARG FLUTTER_VERSION="3.13.9"
+ARG FLUTTER_VERSION="3.16.5"
 #ARG DART_VERSION="3.0.6"
 # 6858069 7302050 8092744 8512546 10572941
 ARG ANDROID_SDK_TOOLS_VERSION="10572941"
+#ARG ANDROID_SDK_TOOLS_VERSION="10572941"
 
 ENV ANDROID_SDK_ROOT="/home/${DEV_USER}/android"
 ENV CHANNEL="stable"
@@ -43,6 +44,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Update the image
 RUN apt-get update
+#RUN apt-get install python-software-properties \
+#  && add-apt-repository ppa:webupd8team/java \
+#  && apt-get update
 
 # Install required packages
 RUN apt-get install -y --no-install-recommends openjdk-${JAVA_VERSION}-jdk ${OS_PACKAGES} \
@@ -106,9 +110,7 @@ RUN flutter emulators --create \
 #RUN echo "Vulkan = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
 #RUN echo "GLDirectMem = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
 
-EXPOSE 5037
-EXPOSE 5900
-EXPOSE 9100
+EXPOSE 5037 5900 9100
 
 # // TODO:: Add other packages
 
