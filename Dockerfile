@@ -23,6 +23,7 @@ ARG FLUTTER_VERSION="3.16.5"
 ARG ANDROID_SDK_TOOLS_VERSION="10572941"
 #ARG GRADLE_VERSION="8.4"
 ARG GRADLE_VERSION="7.6.3"
+ARG DEV_NAME="fluttserver"
 
 
 ENV ANDROID_SDK_ROOT="/home/${DEV_USER}/android"
@@ -68,13 +69,14 @@ RUN gpasswd -a ${DEV_USER} kvm && adduser ${DEV_USER} kvm
 
 RUN echo 'export PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin"' >> /home/${DEV_USER}/.bashrc
 
+RUN echo "${DEV_NAME}" > /etc/debian_chroot
 RUN cat <<EOT >> /home/${DEV_USER}/.bashrc
 
 parse_git_branch() {
-     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'
 }
 
-export PS1="\e[91m\]\$(parse_git_branch)\[\e[00m\] $PS1"
+export PS1="${debian_chroot:+$debian_chroot}\e[01;36m\] ➜ \W \e[34m\]git:(\e[91m\]$(parse_git_branch)\e[34m\])\[\e[00m\] "
 
 EOT
 
