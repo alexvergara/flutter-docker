@@ -17,7 +17,6 @@ The idea is to have a Docker container where I can connect and run any flutter a
 - ARG FLUTTER_VERSION="3.7.0"
 - ARG ANDROID_SDK_TOOLS_VERSION="8092744"
 - ARG ANDROID_BUILD_TOOLS_VERSION="34.0.0"
-- ARG ANDROID_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip"
 
 ## Build with args and replace the values you need
 
