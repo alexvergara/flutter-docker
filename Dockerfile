@@ -21,6 +21,9 @@ ARG FLUTTER_VERSION="3.16.5"
 #ARG DART_VERSION="3.0.6"
 # 6858069 7302050 8092744 8512546 10572941
 ARG ANDROID_SDK_TOOLS_VERSION="10572941"
+#ARG GRADLE_VERSION="8.4"
+ARG GRADLE_VERSION="7.6.3"
+
 
 ENV ANDROID_SDK_ROOT="/home/${DEV_USER}/android"
 ENV CHANNEL="stable"
@@ -29,13 +32,15 @@ ENV CHANNEL="stable"
 ENV FLUTTER_URL="https://storage.googleapis.com/flutter_infra_release/releases/${CHANNEL}/linux/flutter_linux_${FLUTTER_VERSION}-${CHANNEL}.tar.xz"
 #ENV DART_URL="https://storage.googleapis.com/dart-archive/channels/${CHANNEL}/release/${DART_VERSION}/sdk/dartsdk-linux-x64-release.zip"
 ENV CMDLINE_TOOS_URL="https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS_VERSION}_latest.zip"
+ENV GRADLE_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
 ENV FLUTTER_HOME="/home/${DEV_USER}/flutter"
 ENV FLUTTER_ROOT="${FLUTTER_HOME}"
 ENV FLUTTER_WEB_PORT="8090"
 ENV FLUTTER_DEBUG_PORT="42000"
 ENV FLUTTER_EMULATOR_NAME="flutter_emulator"
-#ENV PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:"
-ENV PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:"
+ENV GRADLE_HOME="/home/${DEV_USER}/gradle"
+
+ENV PATH="${PATH}:${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin:${ANDROID_SDK_ROOT}/emulator:${ANDROID_SDK_ROOT}/platform-tools:${ANDROID_SDK_ROOT}/platforms:${FLUTTER_HOME}/bin:${GRADLE_HOME}/bin:"
 
 
 # Avoid user interaction
@@ -86,6 +91,11 @@ USER "${DEV_USER}"
 # Set the working directory
 WORKDIR /code/apps
 
+# Gradle
+RUN curl -L ${GRADLE_URL} -o gradle.zip \
+  && unzip gradle.zip \
+  && mv gradle-${GRADLE_VERSION} ${GRADLE_HOME} \
+  && rm gradle.zip
 
 # Android SDK
 RUN mkdir -p ${ANDROID_SDK_ROOT} \
@@ -119,7 +129,7 @@ RUN flutter emulators --create \
 #RUN echo "Vulkan = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
 #RUN echo "GLDirectMem = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
 
-EXPOSE 5037 5900 9100
+EXPOSE 5037 5555 5900 8554 9100
 
 # // TODO:: Add other packages
 
