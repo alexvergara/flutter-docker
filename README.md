@@ -10,7 +10,7 @@ The idea is to have a Docker container where I can connect and run any flutter a
 
 ## Default values
 
-- ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libglvnd0 x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx libxdamage-dev"
+- ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libglvnd0 x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx libxdamage-dev cmake"
 - ARG DEV_USER=dev
 - ARG JAVA_VERSION="11"
 - ARG ANDROID_VERSION="34"
