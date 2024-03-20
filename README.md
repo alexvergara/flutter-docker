@@ -12,10 +12,10 @@ The idea is to have a Docker container where I can connect and run any flutter a
 
 - ARG OS_PACKAGES="sudo curl unzip sed bash git openssh-server xz-utils xauth libglvnd0 x11-xserver-utils libpulse0 libxcomposite1 libgl1-mesa-glx libxdamage-dev cmake"
 - ARG DEV_USER=dev
-- ARG JAVA_VERSION="11"
+- ARG JAVA_VERSION="18"
 - ARG ANDROID_VERSION="34"
-- ARG FLUTTER_VERSION="3.7.0"
-- ARG ANDROID_SDK_TOOLS_VERSION="8092744"
+- ARG FLUTTER_VERSION="3.16.5"
+- ARG ANDROID_SDK_TOOLS_VERSION="10572941"
 - ARG ANDROID_BUILD_TOOLS_VERSION="34.0.0"
 
 ## Build with args and replace the values you need
