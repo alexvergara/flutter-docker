@@ -125,8 +125,13 @@ RUN tar xf flutter.tar.xz -C /home/${DEV_USER} \
   && flutter precache \
   && yes "y" | flutter doctor --android-licenses \
   && flutter doctor
-RUN flutter emulators --create \
+RUN flutter emulators --create --name ${FLUTTER_EMULATOR_NAME} \
   && flutter update-packages
+
+RUN echo "hw.keyboard=yes" >> /home/${DEV_USER}/.android/avd/${FLUTTER_EMULATOR_NAME}.avd/config.ini
+
+# Aliases
+RUN echo "alias emulate=\"flutter emulators --launch ${FLUTTER_EMULATOR_NAME}\"" >> /home/${DEV_USER}/.bashrc
 
 #RUN echo "Vulkan = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
 #RUN echo "GLDirectMem = on" >> /home/${DEV_USER}/.android/advancedFeatures.ini
